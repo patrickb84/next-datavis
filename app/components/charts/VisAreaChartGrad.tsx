@@ -38,7 +38,7 @@ const transformData = (data1: XYDataPoint[], data2: XYDataPoint[]): DataPoint[] 
   return transformedData;
 };
 
-export default function VisAreaChartGrad() {
+export default function VisAreaChartGrad({ data }: { data: any }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart width={730} height={250} data={data}>
