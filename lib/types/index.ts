@@ -1,6 +1,6 @@
 export interface Country {
-	id: string;
-	name: string;
+	value: string;
+	label: string;
 }
 
 export interface CountryIndicatorData {

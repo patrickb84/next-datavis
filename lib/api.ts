@@ -8,14 +8,13 @@ async function fetchCountries(): Promise<Country[]> {
 		throw new Error('Failed to fetch countries');
 	}
 	const data = await response.json();
-	const countries: Country[] = data[1];
 
-	const formattedCountries = countries.map((country) => ({
-		id: country.id,
-		name: country.name
+	const countries: Country[] = data[1].map((country: any) => ({
+		value: country.id,
+		label: country.name
 	}));
 
-	return formattedCountries;
+	return countries;
 }
 
 async function fetchIndicatorDescription(indicatorCode: string): Promise<Indicator> {
