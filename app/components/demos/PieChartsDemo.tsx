@@ -36,7 +36,7 @@ export default function PieChartDemo({ countriesData }: PieChartProps) {
             </PopoverTrigger>
             <PopoverContent className='w-[500px]'>
               {indicatorInfo.map((info: string, i: number) => (
-                <p className="mb-3 text-sm">{info}</p>
+                <p key={i} className="mb-3 text-sm">{info}</p>
               ))}
             </PopoverContent>
           </Popover>
