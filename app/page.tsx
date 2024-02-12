@@ -1,9 +1,12 @@
-import Image from "next/image";
+import { fetchCountries } from '@/lib/api';
 
-export default function Home() {
+export default async function Home() {
+  const data = await fetchCountries();
+
   return (
     <main>
-      <h1>Home</h1>
+      <h1>Countries</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
     </main>
   );
 }
