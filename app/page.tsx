@@ -1,44 +1,113 @@
-import { fetchCountries, fetchCountryIndicatorData, fetchIndicatorDescription } from '@/lib/api';
-import { indicators } from '@/lib/constants';
+import {
+  fetchCountries,
+  fetchCountryIndicatorData,
+  fetchIndicatorDescription,
+  fetchMultiCountryData,
+} from '@/lib/api';
+import { countryCodesArray, countryCodesArrayLong, indicators } from '@/lib/constants';
 import CountryComboBox from './components/CountryComboBox';
 import VisAreaChart from './components/charts/VisAreaChart';
 import { Card, CardContent } from '@/components/ui/card';
-import { transformCountryIndicatorData } from '@/lib/types/transformers';
+import {
+  jsonStatToBarGraphData,
+  jsonStatToStackedBarsData,
+  jsonStatToStackedBarsUrban,
+  transformCountryIndicatorData,
+  transformJsonstat,
+} from '@/lib/types/transformers';
+import VisAreaChartGrad from './components/charts/VisAreaChartGrad';
+import { Bar } from 'recharts';
+import BarGraphDemo from './components/demos/BarGraphDemo';
+import StackedBarsDemo from './components/demos/StackedBarsDemo';
+import StackedBarsUrbanDemo from './components/demos/StackedBarsUrban';
+import PieChartsDemo from './components/demos/PieChartsDemo';
 
-export default async function Home() {
-  // const countries = await fetchCountries();
+async function getPieData() {
+  const _forestData = await fetchMultiCountryData(
+    countryCodesArray,
+    indicators.forestAreaLandPercentage,
+    {
+      date: '2020',
+    }
+  );
+  const forestData = transformJsonstat(_forestData);
+  // console.log(forestData);
 
-  // const indicator = await fetchIndicatorDescription(indicators.gdp);
+  const _agricturalLandData = await fetchMultiCountryData(
+    countryCodesArray,
+    indicators.agriculturalLandPercentage,
+    {
+      date: '2020',
+    }
+  );
 
-  const countryIndicatorData = await fetchCountryIndicatorData('USA', indicators.co2Emissions, {
-    date: '2010:2020',
+  const agricturalLandData = transformJsonstat(_agricturalLandData);
+
+  const countries = forestData.countries;
+  const forests: Number[] = forestData.values;
+  const agricutures: Number[] = agricturalLandData.values;
+
+  const pieData = countries.map((country, i) => {
+    // mathematically round to 2 decimal places
+    const forest = Number(forests[i].toFixed(2));
+    const agriculture = Number(agricutures[i].toFixed(2));
+    const other = 100 - (forest + agriculture);
+
+    const data = [
+      { name: 'Forest', value: forest },
+      { name: 'Agriculture', value: agriculture },
+      { name: 'Other', value: Number(other.toFixed(2)) },
+    ];
+    return { name: country, data: data };
   });
 
-  console.log('countryIndicatorData', transformCountryIndicatorData(countryIndicatorData));
+  const indicatorForest = await fetchIndicatorDescription(indicators.forestAreaLandPercentage);
+  const indicatorAgriculture = await fetchIndicatorDescription(indicators.agriculturalLandPercentage);
+
+  return pieData;
+}
+
+export default async function Home() {
+  const _barGraphData = await fetchMultiCountryData(countryCodesArray, indicators.gdpChange, {
+    date: '2012:2022',
+  });
+  const barGraphData = jsonStatToBarGraphData(_barGraphData);
+  const barGraphIndicator = await fetchIndicatorDescription(indicators.gdpChange);
+
+  const _stackedBarsData = await fetchMultiCountryData(
+    countryCodesArrayLong,
+    indicators.renewableEnergyUse,
+    {
+      date: '2020',
+    }
+  );
+  const stackedBarsData = jsonStatToStackedBarsData(_stackedBarsData);
+  const stackedBarsIndicator = await fetchIndicatorDescription(indicators.renewableEnergyUse);
+
+  const _stackedBarsUrbanData = await fetchMultiCountryData(
+    countryCodesArrayLong,
+    indicators.urbanPopulation,
+    {
+      date: '2020',
+    }
+  );
+  const stackedBarsUrbanData = jsonStatToStackedBarsUrban(_stackedBarsUrbanData);
+  const stackedBarsUrbanIndicator = await fetchIndicatorDescription(indicators.urbanPopulation);
+
+  const pieData = await getPieData();
 
   return (
-    <div>
-      <Card>
-        <CardContent>
-          <VisAreaChart data={transformCountryIndicatorData(countryIndicatorData)} />
-        </CardContent>
-      </Card>
-      {/* <CountryComboBox /> */}
+    <div className="pt-4 px-4">
+      <BarGraphDemo graph={barGraphData} indicator={barGraphIndicator} />
 
-      {/* <pre className="max-w-full">{JSON.stringify(countries, null, 2)}</pre> */}
-      {/* <h1>Indicator: {indicators.gdp}</h1>
-      <pre>{JSON.stringify(indicator, null, 2)}</pre> */}
+      <div className="lg:flex lg:gap-5">
+        <StackedBarsDemo graph={stackedBarsData} indicator={stackedBarsIndicator} />
+        <StackedBarsUrbanDemo graph={stackedBarsUrbanData} indicator={stackedBarsUrbanIndicator} />
+      </div>
 
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <h1>Country Indicator Data</h1>
-      <pre>{JSON.stringify(countryIndicatorData, null, 2)}</pre>
+      <div>
+        <PieChartsDemo countriesData={pieData} />
+      </div>
     </div>
   );
 }

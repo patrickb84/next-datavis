@@ -26,7 +26,10 @@ export default function CountryComboBox() {
 
   React.useEffect(() => {
     fetchCountries().then((data) => {
-      const countries = data.map((country) => ({ ...country, value: country.value.toLowerCase() }));
+      const countries = data.map((country) => ({
+        label: country.value + ': ' + country.label,
+        value: country.value.toLowerCase(),
+      }));
       setCountries(countries);
     });
   }, []);

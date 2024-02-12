@@ -22,7 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           enableSystem
           disableTransitionOnChange>
           <Navbar />
-          <main className="max-w-2xl mx-auto px-4 pb-16">{children}</main>
+          <main className="w-full mx-auto px-4 pb-16 pt-6 dark:bg-black">{children}</main>
         </ThemeProvider>
       </body>
     </html>

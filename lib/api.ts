@@ -1,3 +1,4 @@
+import { countryCodes, indicators } from './constants';
 import { Country, CountryIndicatorData, Indicator } from './types';
 
 const BASE_URL: string = 'http://api.worldbank.org/v2/';
@@ -34,6 +35,8 @@ async function fetchIndicatorDescription(indicatorCode: string): Promise<Indicat
 	return indicator;
 }
 
+
+
 async function fetchCountryIndicatorData(countryCode: string, indicatorCode: string, options?: { date?: string }): Promise<CountryIndicatorData> {
 	let url = `${BASE_URL}country/${countryCode}/indicator/${indicatorCode}?format=jsonstat`;
 
@@ -60,5 +63,22 @@ async function fetchCountryIndicatorData(countryCode: string, indicatorCode: str
 	return formattedData;
 }
 
+async function fetchMultiCountryData(countryCodes: string[], indicatorCode: string, options?: { date?: string }): Promise<CountryIndicatorData[]> {
+	const countryCodesString = countryCodes.join(';');
+	let url = `${BASE_URL}country/${countryCodesString}/indicator/${indicatorCode}?format=jsonstat`;
+	if (options?.date) {
+		url += `&date=${options.date}`;
+	}
 
-export { fetchCountries, fetchIndicatorDescription, fetchCountryIndicatorData }
+	const response = await fetch(url);
+
+	if (!response.ok) {
+		throw new Error('Failed to fetch country indicator data');
+	}
+
+	const data = await response.json();
+
+	return data;
+}
+
+export { fetchCountries, fetchIndicatorDescription, fetchCountryIndicatorData, fetchMultiCountryData }

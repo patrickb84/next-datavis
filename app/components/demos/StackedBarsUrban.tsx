@@ -1,0 +1,68 @@
+'use client';
+
+import { colorScale } from '@/lib/constants';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import React from 'react';
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import { Info } from 'lucide-react';
+
+interface GraphProps {
+  graph: {
+    keys: string[];
+    data: any[];
+  };
+  indicator: any;
+}
+
+export default function StackedBarsUrbanDemo({ graph, indicator }: GraphProps) {
+  const { keys, data } = graph;
+
+  return (
+    <Card className="pb-6 mb-6 lg:w-1/2">
+      <CardHeader>
+        <h2 className="flex justify-between">
+          <div>
+            <span className="text-xl font-bold ">{indicator.name}</span>
+          </div>
+          <Popover>
+            <PopoverTrigger>
+              <Info />
+            </PopoverTrigger>
+            <PopoverContent>{indicator.sourceNote}</PopoverContent>
+          </Popover>
+        </h2>
+      </CardHeader>
+      <ResponsiveContainer width="100%" height={500}>
+        <BarChart
+          width={500}
+          height={300}
+          data={data}
+          margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip labelClassName="text-black font-bold" />
+          <Legend />
+          <Bar dataKey="Non-Urban" stackId="a" fill={colorScale[0]} />
+          <Bar dataKey="Urban" stackId="a" fill={colorScale[2]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+}

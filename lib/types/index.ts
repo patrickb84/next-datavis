@@ -17,3 +17,11 @@ export interface Indicator {
 	name: string;
 	sourceNote: string;
 }
+
+export interface JsonStatData {
+	values: number[];
+	years: number[];
+	countries: string[];
+	indicator: string;
+	indicatorName: string;
+}
